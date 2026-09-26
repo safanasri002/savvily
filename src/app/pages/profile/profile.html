@@ -1,0 +1,53 @@
+<header class="page-header">
+  <h1 class="page-title">Profile</h1>
+  <p class="page-subtitle">Manage your account and financial details.</p>
+</header>
+
+@if (user(); as u) {
+  <section class="section" aria-labelledby="account-heading">
+    <div class="section-intro">
+      <h2 id="account-heading" class="section-title">Account</h2>
+      <p class="section-text">The name and email you signed up with.</p>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="field">
+          <label class="label" for="firstName">First name</label>
+          <input id="firstName" class="input" type="text" [value]="u.firstName" readonly />
+        </div>
+        <div class="field">
+          <label class="label" for="lastName">Last name</label>
+          <input id="lastName" class="input" type="text" [value]="u.lastName" readonly />
+        </div>
+      </div>
+      <div class="field field--spaced">
+        <label class="label" for="email">Email</label>
+        <input id="email" class="input" type="email" [value]="u.email" readonly />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="financial-heading">
+    <div class="section-intro">
+      <h2 id="financial-heading" class="section-title">Financial profile</h2>
+      <p class="section-text">Used to personalise your budget and savings goals. Only you can see it.</p>
+    </div>
+
+    <div class="card">
+      @if (formError(); as message) {
+        <p class="form-alert" role="alert">{{ message }}</p>
+      }
+      <app-profile-form submitLabel="Save changes" [initial]="profile()" [pending]="pending()" (save)="save($event)">
+        @if (saved()) {
+          <span secondary class="saved" role="status">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+              <path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Saved
+          </span>
+        }
+      </app-profile-form>
+    </div>
+  </section>
+}

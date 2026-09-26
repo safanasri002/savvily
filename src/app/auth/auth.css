@@ -1,0 +1,76 @@
+:host {
+  display: block;
+}
+
+/* ---------- Layout ---------- */
+
+.shell {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  animation: enter 480ms var(--ease) both;
+}
+
+.auth-brand {
+  margin-bottom: 32px;
+}
+
+/* ---------- Title ---------- */
+
+.title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.title-option {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--text-subtle);
+  cursor: pointer;
+  transition: color 200ms var(--ease);
+}
+
+.title-option:hover {
+  color: var(--text-muted);
+}
+
+.title-option.is-active {
+  color: var(--text);
+  cursor: default;
+}
+
+.title-option:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.title-divider {
+  color: var(--border-strong);
+  font-weight: 400;
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  color: var(--text-muted);
+}
+
+.forgot {
+  font-size: 12.5px;
+}
+
+.switch {
+  margin: 20px 0 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}

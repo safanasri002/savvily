@@ -1,0 +1,208 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+/* ---------- Navbar ---------- */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  max-width: 1120px;
+  height: 56px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.nav {
+  display: flex;
+  align-self: stretch;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 150ms var(--ease);
+}
+
+.nav-link:hover {
+  color: var(--text);
+}
+
+/* Active tab: underline sitting on the navbar border */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--text);
+  transform: scaleX(0);
+  transition: transform 200ms var(--ease);
+}
+
+.nav-link.is-active {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.nav-link.is-active::after {
+  transform: scaleX(1);
+}
+
+.nav-link:focus-visible,
+.profile-link:focus-visible,
+.logout:focus-visible,
+.brand:focus-visible {
+  outline: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* ---------- Right side ---------- */
+
+.nav-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px 0 4px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  text-decoration: none;
+  transition:
+    color 150ms var(--ease),
+    background-color 150ms var(--ease),
+    border-color 150ms var(--ease);
+}
+
+.profile-link:hover {
+  color: var(--text);
+  background: var(--surface-muted);
+}
+
+.profile-link.is-active {
+  color: var(--text);
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.logout {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition:
+    color 150ms var(--ease),
+    background-color 150ms var(--ease);
+}
+
+.logout:hover {
+  color: var(--text);
+  background: var(--surface-muted);
+}
+
+/* ---------- Content ---------- */
+
+.content {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+  animation: enter 360ms var(--ease) both;
+}
+
+/* ---------- Small screens: links move to a scrollable second row ---------- */
+
+@media (max-width: 720px) {
+  .navbar-inner {
+    flex-wrap: wrap;
+    gap: 0;
+    height: auto;
+    padding: 0 16px;
+  }
+
+  .brand {
+    height: 52px;
+  }
+
+  .nav-end {
+    margin-left: auto;
+  }
+
+  .nav {
+    order: 3;
+    flex-basis: 100%;
+    height: 44px;
+    margin: 0 -16px;
+    padding: 0 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .profile-name,
+  .logout-label {
+    display: none;
+  }
+
+  .profile-link {
+    padding: 0 3px;
+  }
+
+  .content {
+    padding: 28px 16px 48px;
+  }
+}

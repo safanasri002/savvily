@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.actions .btn-primary {
+  min-width: 120px;
+}
+
+@media (max-width: 420px) {
+  .actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 12px;
+  }
+}

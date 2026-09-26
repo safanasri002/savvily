@@ -1,0 +1,37 @@
+<main class="centered-page">
+  <section class="shell" aria-labelledby="onboarding-title">
+    <div class="brand onboarding-brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Savvily</span>
+    </div>
+
+    <div class="steps" aria-label="Step 2 of 2">
+      <span class="step is-done"></span>
+      <span class="step is-current"></span>
+      <span class="steps-label">Step 2 of 2</span>
+    </div>
+
+    <h1 id="onboarding-title" class="title">Complete your profile</h1>
+    <p class="subtitle">
+      Welcome{{ user()?.firstName ? ', ' + user()?.firstName : '' }}. A few details help Savvily
+      tailor your budget and savings goals.
+    </p>
+
+    <div class="card">
+      @if (formError(); as message) {
+        <p class="form-alert" role="alert">{{ message }}</p>
+      }
+      <app-profile-form submitLabel="Continue" [pending]="pending()" (save)="save($event)">
+        <button secondary type="button" class="link-subtle" (click)="skip()">Skip for now</button>
+      </app-profile-form>
+    </div>
+
+    <p class="privacy">
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M5.5 7V5a2.5 2.5 0 015 0v2" fill="none" stroke="currentColor" stroke-width="1.3"/>
+      </svg>
+      Only you can see this. You can change it anytime from your profile.
+    </p>
+  </section>
+</main>

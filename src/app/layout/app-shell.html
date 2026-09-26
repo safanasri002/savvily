@@ -1,0 +1,40 @@
+<header class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" routerLink="/dashboard" aria-label="Savvily home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Savvily</span>
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      @for (item of navItems; track item.path) {
+        <a class="nav-link" [routerLink]="item.path" routerLinkActive="is-active" ariaCurrentWhenActive="page">
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="nav-end">
+      <a
+        class="profile-link"
+        routerLink="/profile"
+        routerLinkActive="is-active"
+        ariaCurrentWhenActive="page"
+        aria-label="Profile"
+      >
+        <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+        <span class="profile-name">{{ user()?.firstName }}</span>
+      </a>
+
+      <button type="button" class="logout" aria-label="Log out" (click)="logout()">
+        <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+          <path d="M6 2.5H3.5a1 1 0 00-1 1v9a1 1 0 001 1H6M10.5 11l3-3-3-3M13.5 8H6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logout-label">Log out</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="content">
+  <router-outlet />
+</main>
