@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from '../core/auth.service';
+import { Sign } from '../service/sign';
 
 interface NavItem {
   label: string;
@@ -16,7 +16,7 @@ interface NavItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppShell {
-  private readonly auth = inject(AuthService);
+  private readonly auth = inject(Sign);
   private readonly router = inject(Router);
 
   protected readonly navItems: NavItem[] = [

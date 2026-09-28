@@ -13,10 +13,9 @@
 
     <h1 id="onboarding-title" class="title">Complete your profile</h1>
     <p class="subtitle">
-      Welcome{{ user()?.firstName ? ', ' + user()?.firstName : '' }}. A few details help Savvily
+      Welcome . A few details help Savvily
       tailor your budget and savings goals.
     </p>
-
     <div class="card">
       @if (formError(); as message) {
         <p class="form-alert" role="alert">{{ message }}</p>

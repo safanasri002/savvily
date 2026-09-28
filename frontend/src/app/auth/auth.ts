@@ -39,12 +39,7 @@ export class Auth {
     firstName: [{ value: '', disabled: true }, Validators.required],
     lastName: [{ value: '', disabled: true }, Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]],
-    profession : [{ value: '', disabled: true }, Validators.required],
-    maritalstatus : [{ value: '', disabled: true }, Validators.required],
-    kids : [{ value:0, disabled: true }, Validators.required],
-    birthday : [{ value: '', disabled: true }, Validators.required],
-    salary : [{ value: 0, disabled: true }, Validators.required],
+    password: ['', [Validators.required, Validators.minLength(8)]]
   });
 
   protected setMode(mode: AuthMode): void {
@@ -85,15 +80,14 @@ export class Auth {
       return;
     }
 
-    const { firstName, lastName, email, password ,profession , maritalstatus, kids, birthday, salary} = this.form.getRawValue();
+    const { firstName, lastName, email, password} = this.form.getRawValue();
     this.pending.set(true);
     try {
       if (this.isSignUp()) {
-        await this.auth.signUp({firstname:firstName,lastname:lastName, email, password, profession , maritalstatus, kids, birthday, salary});
-        await this.router.navigateByUrl('/onboarding');
+        await this.router.navigate(['/onboarding'],{ queryParams: { firstName, lastName, email, password } });
         console.log('Sign up successful');
       } else {
-        //await this.auth.signIn({ email, password });
+        await this.auth.signIn({ email, password });
         await this.router.navigateByUrl('/dashboard');
         console.log('Sign in successful');
       }

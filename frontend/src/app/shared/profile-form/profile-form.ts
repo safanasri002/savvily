@@ -1,15 +1,22 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, input, output, signal } from '@angular/core';
 import { AbstractControl, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { UserProfile } from '../../core/user';
 
-type FieldName = 'profession' | 'maritalstatus'|'kids'|'birthday' | 'salary';
+type FieldName = 'profession' | 'maritalstatus' | 'kids' | 'birthday' | 'salary';
+
+export interface ProfileFormValue {
+  profession: string;
+  maritalstatus: string;
+  kids: number | null;
+  birthday: string;
+  salary: number | null;
+}
 
 const MIN_AGE = 16;
 
 const ERROR_MESSAGES: Record<FieldName, Record<string, string>> = {
   profession: { required: 'Profession is required.' },
   maritalstatus: { required: 'marital status is required.' },
-  kids: { required: 'kids is required.' },
+  kids: { required: 'Number of kids is required.', min: 'Number of kids cannot be negative.' },
   birthday: {
     required: 'Date of birth is required.',
     date: 'Enter a valid date.',
@@ -38,10 +45,10 @@ function minAge(years: number) {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileForm implements OnInit {
-  readonly initial = input<UserProfile | null>(null);
   readonly submitLabel = input('Save');
   readonly pending = input(false);
-  readonly save = output<UserProfile>();
+  readonly initial = input<Partial<ProfileFormValue> | null>(null);
+  readonly save = output<ProfileFormValue>();
 
   protected readonly attempted = signal(false);
   protected readonly maxBirthDate = new Date().toISOString().slice(0, 10);
@@ -51,7 +58,7 @@ export class ProfileForm implements OnInit {
   protected readonly form = this.fb.group({
     profession: ['', Validators.required],
     maritalstatus: ['', Validators.required],
-    kids: ['', Validators.required],
+    kids: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
     birthday: ['', [Validators.required, minAge(MIN_AGE)]],
     salary: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
   });
@@ -61,10 +68,10 @@ export class ProfileForm implements OnInit {
     if (initial) {
       this.form.setValue({
         profession: initial.profession ?? '',
-        maritalstatus: initial.profession ?? '',
-        kids: initial.profession ?? '',
+        maritalstatus: initial.maritalstatus ?? '',
+        kids: initial.kids ?? null,
         birthday: initial.birthday ?? '',
-        salary: initial.salary,
+        salary: initial.salary ?? null,
       });
     }
   }
@@ -87,9 +94,15 @@ export class ProfileForm implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    const { profession, birthday, salary } = this.form.getRawValue();
+    const { profession, maritalstatus, kids, birthday, salary } = this.form.getRawValue();
     // `salary` is an int8 column: store whole units.
-    this.save.emit({ profession: profession.trim(), birthday, salary: Math.round(salary ?? 0) });
+    this.save.emit({
+      profession: profession.trim(),
+      maritalstatus: maritalstatus.trim(),
+      kids: Math.round(kids ?? 0),
+      birthday,
+      salary: Math.round(salary ?? 0),
+    });
     this.form.markAsPristine();
   }
 }

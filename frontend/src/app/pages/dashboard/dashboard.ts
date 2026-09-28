@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../core/auth.service';
+import { Sign } from '../../service/sign';
 
 @Component({
   selector: 'app-dashboard',
@@ -48,7 +48,7 @@ import { AuthService } from '../../core/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
-  protected readonly auth = inject(AuthService);
+  protected readonly auth = inject(Sign);
 
   protected readonly greeting = computed(() => {
     const hour = new Date().getHours();
