@@ -1,0 +1,163 @@
+:host {
+  display: block;
+}
+
+.header-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.header-row .btn-primary {
+  flex-shrink: 0;
+}
+
+/* Add form */
+
+.add-form {
+  margin-bottom: 24px;
+  padding: 20px;
+}
+
+.segmented {
+  display: inline-flex;
+  margin-bottom: 16px;
+  padding: 3px;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+
+.segmented button {
+  height: 30px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.segmented button.is-active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.add-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.4fr 1.2fr;
+  gap: 12px;
+}
+
+.add-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.form-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+/* Filters */
+
+.filters {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Table */
+
+.table-card {
+  padding: 0;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.table th {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table tbody tr:hover {
+  background: var(--surface-muted);
+}
+
+.num {
+  text-align: right !important;
+}
+
+.cell-title {
+  font-weight: 500;
+}
+
+.cell-muted {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.cell-action {
+  width: 1%;
+  padding-left: 0 !important;
+}
+
+.empty-state .btn-sm {
+  margin-top: 12px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 820px) {
+  .add-grid,
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+  .filters .input[type='search'] {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .add-grid {
+    grid-template-columns: 1fr;
+  }
+}

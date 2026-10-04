@@ -1,0 +1,150 @@
+<header class="page-header">
+  <h1 class="page-title">Goals &amp; Wishlist</h1>
+  <p class="page-subtitle">Set savings goals and plan the products you want to buy.</p>
+</header>
+
+<section class="stats" aria-label="Summary">
+  <div class="stat">
+    <p class="stat-label">Saved in goals</p>
+    <p class="stat-value">{{ money(totalSaved()) }}</p>
+    <p class="stat-hint">of {{ money(totalTarget()) }} targeted</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Active goals</p>
+    <p class="stat-value">{{ goals().length }}</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Wishlist to buy</p>
+    <p class="stat-value">{{ money(wishlistLeft()) }}</p>
+  </div>
+</section>
+
+<!-- Goals -->
+<section class="block" aria-labelledby="goals-heading">
+  <div class="block-head">
+    <h2 id="goals-heading" class="panel-title">Savings goals</h2>
+    <button type="button" class="btn-secondary btn-sm" (click)="showGoalForm.set(!showGoalForm())">
+      {{ showGoalForm() ? 'Cancel' : 'New goal' }}
+    </button>
+  </div>
+
+  @if (showGoalForm()) {
+    <form class="card inline-form reveal" [formGroup]="goalForm" (ngSubmit)="addGoal()" novalidate aria-label="New goal">
+      <div class="field grow">
+        <label class="label" for="g-name">Goal</label>
+        <input id="g-name" class="input" type="text" formControlName="name" placeholder="e.g. Emergency fund"
+          [class.is-invalid]="goalForm.controls.name.invalid && goalForm.controls.name.touched" />
+      </div>
+      <div class="field">
+        <label class="label" for="g-target">Target (€)</label>
+        <input id="g-target" class="input" type="number" min="1" formControlName="target"
+          [class.is-invalid]="goalForm.controls.target.invalid && goalForm.controls.target.touched" />
+      </div>
+      <div class="field">
+        <label class="label" for="g-saved">Already saved (€)</label>
+        <input id="g-saved" class="input" type="number" min="0" formControlName="saved" />
+      </div>
+      <div class="field">
+        <label class="label" for="g-deadline">Deadline</label>
+        <input id="g-deadline" class="input input--date" type="date" formControlName="deadline" />
+      </div>
+      <button type="submit" class="btn-primary">Add goal</button>
+    </form>
+  }
+
+  <div class="goal-grid">
+    @for (g of goals(); track g.id) {
+      <article class="card goal">
+        <div class="goal-head">
+          <h3 class="goal-name">{{ g.name }}</h3>
+          @if (g.saved >= g.target) {
+            <span class="badge is-success">Reached</span>
+          } @else {
+            <span class="badge">{{ percent(g) }}%</span>
+          }
+        </div>
+
+        <p class="goal-amounts">
+          <span class="amount strong">{{ money(g.saved) }}</span>
+          <span class="muted"> / <span class="amount">{{ money(g.target) }}</span></span>
+        </p>
+        <div class="progress">
+          <div class="progress-bar" [class.is-done]="g.saved >= g.target" [style.width.%]="percent(g)"></div>
+        </div>
+        <p class="goal-deadline">{{ deadlineLabel(g) }}</p>
+
+        <div class="goal-actions">
+          <input class="input input-sm" type="number" min="0" placeholder="Amount"
+            [attr.aria-label]="'Amount for ' + g.name"
+            [value]="contributions()[g.id] || ''" (input)="setContribution(g.id, $event)" />
+          <button type="button" class="btn-secondary btn-sm" (click)="contribute(g, 1)" [disabled]="g.saved >= g.target">Add</button>
+          <button type="button" class="btn-secondary btn-sm" (click)="contribute(g, -1)" [disabled]="g.saved <= 0">Withdraw</button>
+          <button type="button" class="icon-btn" [attr.aria-label]="'Delete ' + g.name" (click)="removeGoal(g.id)">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+              <path d="M3 4.5h10M6.5 4.5V3h3v1.5M5 4.5l.5 8.5h5l.5-8.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </article>
+    } @empty {
+      <div class="empty-state">
+        <p class="empty-state-title">No goals yet</p>
+        <p class="empty-state-text">Create a goal to start saving towards something.</p>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- Wishlist -->
+<section class="block" aria-labelledby="wishlist-heading">
+  <div class="block-head">
+    <h2 id="wishlist-heading" class="panel-title">Wishlist</h2>
+    <button type="button" class="btn-secondary btn-sm" (click)="showWishForm.set(!showWishForm())">
+      {{ showWishForm() ? 'Cancel' : 'Add item' }}
+    </button>
+  </div>
+
+  @if (showWishForm()) {
+    <form class="card inline-form reveal" [formGroup]="wishForm" (ngSubmit)="addWish()" novalidate aria-label="New wishlist item">
+      <div class="field grow">
+        <label class="label" for="w-name">Product</label>
+        <input id="w-name" class="input" type="text" formControlName="name" placeholder="e.g. Headphones"
+          [class.is-invalid]="wishForm.controls.name.invalid && wishForm.controls.name.touched" />
+      </div>
+      <div class="field">
+        <label class="label" for="w-price">Price (€)</label>
+        <input id="w-price" class="input" type="number" min="1" formControlName="price"
+          [class.is-invalid]="wishForm.controls.price.invalid && wishForm.controls.price.touched" />
+      </div>
+      <div class="field">
+        <label class="label" for="w-priority">Priority</label>
+        <select id="w-priority" class="input input--select" formControlName="priority">
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary">Add item</button>
+    </form>
+  }
+
+  <ul class="card wishlist">
+    @for (w of wishlist(); track w.id) {
+      <li class="wish" [class.is-bought]="w.bought">
+        <label class="check">
+          <input type="checkbox" [checked]="w.bought" (change)="toggleBought(w.id)" />
+          <span class="wish-name">{{ w.name }}</span>
+        </label>
+        <span class="badge priority-{{ w.priority }}">{{ w.priority }}</span>
+        <span class="amount">{{ money(w.price) }}</span>
+        <button type="button" class="icon-btn" [attr.aria-label]="'Delete ' + w.name" (click)="removeWish(w.id)">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <path d="M3 4.5h10M6.5 4.5V3h3v1.5M5 4.5l.5 8.5h5l.5-8.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </li>
+    } @empty {
+      <li class="muted">Your wishlist is empty.</li>
+    }
+  </ul>
+</section>

@@ -1,15 +1,26 @@
-/** Mirrors the `user` table. Profile fields stay null until onboarding is completed. */
+/** A Savvily account. Profile fields stay null until onboarding is completed. */
 export interface User {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
+  profession: string | null;
+  maritalStatus: MaritalStatus | null;
+  kids: number | null;
   birthday: string | null;
   salary: number | null;
-  profession: string | null;
 }
 
-export type UserProfile = Pick<User, 'birthday' | 'salary' | 'profession'>;
+export type MaritalStatus = 'single' | 'married' | 'divorced' | 'widowed';
+
+export const MARITAL_STATUSES: { value: MaritalStatus; label: string }[] = [
+  { value: 'single', label: 'Single' },
+  { value: 'married', label: 'Married' },
+  { value: 'divorced', label: 'Divorced' },
+  { value: 'widowed', label: 'Widowed' },
+];
+
+export type UserProfile = Pick<User, 'profession' | 'maritalStatus' | 'kids' | 'birthday' | 'salary'>;
 
 export interface SignUpData {
   firstName: string;
@@ -24,5 +35,11 @@ export interface SignInData {
 }
 
 export function isProfileComplete(user: User): boolean {
-  return user.birthday !== null && user.salary !== null && !!user.profession;
+  return (
+    !!user.profession &&
+    user.maritalStatus !== null &&
+    user.kids !== null &&
+    user.birthday !== null &&
+    user.salary !== null
+  );
 }

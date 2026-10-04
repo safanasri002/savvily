@@ -1,54 +1,22 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
+import { CATEGORIES, categoryInfo, formatMoney, isoDate } from '../../core/finance';
+import { FinanceService } from '../../core/finance.service';
 
 @Component({
   selector: 'app-dashboard',
   imports: [RouterLink],
-  template: `
-    <header class="page-header">
-      <h1 class="page-title">{{ greeting() }}, {{ auth.currentUser()?.firstName }}</h1>
-      <p class="page-subtitle">Here's an overview of your finances.</p>
-    </header>
-
-    @if (!auth.profileComplete()) {
-      <aside class="notice">
-        <div>
-          <p class="notice-title">Finish setting up your profile</p>
-          <p class="notice-text">Add your profession and salary so Savvily can tailor your budget.</p>
-        </div>
-        <a class="btn-secondary" routerLink="/profile">Complete profile</a>
-      </aside>
-    }
-
-    <div class="empty-state">
-      <p class="empty-state-title">No data yet</p>
-      <p class="empty-state-text">Your spending chart and recent transactions will appear here.</p>
-    </div>
-  `,
-  styles: `
-    .notice {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 24px;
-      padding: 16px 20px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      background: var(--surface);
-    }
-    .notice-title { margin: 0; font-weight: 500; }
-    .notice-text { margin: 0; color: var(--text-muted); font-size: 13.5px; }
-    .notice .btn-secondary { flex-shrink: 0; height: 34px; font-size: 13px; }
-    @media (max-width: 560px) {
-      .notice { flex-direction: column; align-items: stretch; }
-    }
-  `,
+  templateUrl: './dashboard.html',
+  styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dashboard {
   protected readonly auth = inject(AuthService);
+  private readonly finance = inject(FinanceService);
+
+  protected readonly money = formatMoney;
+  protected readonly category = categoryInfo;
 
   protected readonly greeting = computed(() => {
     const hour = new Date().getHours();
@@ -56,4 +24,48 @@ export class Dashboard {
     if (hour < 18) return 'Good afternoon';
     return 'Good evening';
   });
+
+  protected readonly monthLabel = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  private readonly thisMonth = computed(() => {
+    const prefix = isoDate(new Date()).slice(0, 7);
+    return this.finance.transactions().filter((t) => t.date.startsWith(prefix));
+  });
+
+  protected readonly income = computed(() => sum(this.thisMonth().filter((t) => t.type === 'income')));
+  protected readonly expenses = computed(() => sum(this.thisMonth().filter((t) => t.type === 'expense')));
+  protected readonly balance = computed(() => this.income() - this.expenses());
+  protected readonly savingsRate = computed(() => {
+    const income = this.income();
+    return income > 0 ? Math.round((this.balance() / income) * 100) : 0;
+  });
+
+  protected readonly totalSaved = computed(() => this.finance.goals().reduce((acc, g) => acc + g.saved, 0));
+
+  /** Expense totals per category for this month, largest first. */
+  protected readonly byCategory = computed(() => {
+    const expenses = this.thisMonth().filter((t) => t.type === 'expense');
+    const total = sum(expenses);
+    return CATEGORIES.map((c) => {
+      const amount = sum(expenses.filter((t) => t.category === c.value));
+      return { ...c, amount, share: total > 0 ? (amount / total) * 100 : 0 };
+    })
+      .filter((c) => c.amount > 0)
+      .sort((a, b) => b.amount - a.amount);
+  });
+
+  protected readonly recent = computed(() => this.finance.transactions().slice(0, 6));
+  protected readonly goals = computed(() => this.finance.goals().slice(0, 3));
+
+  protected percent(saved: number, target: number): number {
+    return target > 0 ? Math.min(100, Math.round((saved / target) * 100)) : 0;
+  }
+
+  protected shortDate(iso: string): string {
+    return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+}
+
+function sum(items: { amount: number }[]): number {
+  return items.reduce((acc, t) => acc + t.amount, 0);
 }

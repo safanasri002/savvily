@@ -7,7 +7,7 @@
       type="text"
       formControlName="profession"
       autocomplete="organization-title"
-      placeholder="enter your profession"
+      placeholder="e.g. Product designer"
       [class.is-invalid]="hasError('profession')"
       [attr.aria-invalid]="hasError('profession')"
       aria-describedby="profession-error"
@@ -17,42 +17,47 @@
     </p>
   </div>
 
+  <div class="row">
     <div class="field">
-    <label class="label" for="Marital Status">Marital Status</label>
-    <input
-      id="maritalstatus"
-      class="input"
-      type="text"
-      formControlName="maritalstatus"
-      autocomplete="organization-title"
-      placeholder="enter your marital status"
-      [class.is-invalid]="hasError('maritalstatus')"
-      [attr.aria-invalid]="hasError('maritalstatus')"
-      aria-describedby="maritalstatus-error"
-    />
-    <p id="maritalstatus-error" class="error" [class.is-visible]="hasError('maritalstatus')" aria-live="polite">
-      @if (hasError('maritalstatus')) { {{ errorFor('maritalstatus') }} }
-    </p>
-  </div>
+      <label class="label" for="maritalStatus">Marital status</label>
+      <select
+        id="maritalStatus"
+        class="input input--select"
+        formControlName="maritalStatus"
+        [class.is-invalid]="hasError('maritalStatus')"
+        [attr.aria-invalid]="hasError('maritalStatus')"
+        aria-describedby="maritalStatus-error"
+      >
+        <option value="" disabled>Select…</option>
+        @for (status of maritalStatuses; track status.value) {
+          <option [value]="status.value">{{ status.label }}</option>
+        }
+      </select>
+      <p id="maritalStatus-error" class="error" [class.is-visible]="hasError('maritalStatus')" aria-live="polite">
+        @if (hasError('maritalStatus')) { {{ errorFor('maritalStatus') }} }
+      </p>
+    </div>
 
-     <div class="field">
-    <label class="label" for="kids">Kids</label>
-    <input
-      id="kids"
-      class="input"
-      type="text"
-      formControlName="kids"
-      autocomplete="organization-title"
-      placeholder="enter how many kids you have"
-      [class.is-invalid]="hasError('kids')"
-      [attr.aria-invalid]="hasError('kids')"
-      aria-describedby="kids-error"
-    />
-    <p id="kids-error" class="error" [class.is-visible]="hasError('kids')" aria-live="polite">
-      @if (hasError('kids')) { {{ errorFor('kids') }} }
-    </p>
+    <div class="field">
+      <label class="label" for="kids">Children</label>
+      <input
+        id="kids"
+        class="input"
+        type="number"
+        inputmode="numeric"
+        min="0"
+        step="1"
+        formControlName="kids"
+        placeholder="0"
+        [class.is-invalid]="hasError('kids')"
+        [attr.aria-invalid]="hasError('kids')"
+        aria-describedby="kids-error"
+      />
+      <p id="kids-error" class="error" [class.is-visible]="hasError('kids')" aria-live="polite">
+        @if (hasError('kids')) { {{ errorFor('kids') }} }
+      </p>
+    </div>
   </div>
-
 
   <div class="row">
     <div class="field">

@@ -16,7 +16,15 @@ export class Profile {
   protected readonly user = this.auth.currentUser;
   protected readonly profile = computed<UserProfile | null>(() => {
     const user = this.user();
-    return user ? { profession: user.profession, birthday: user.birthday, salary: user.salary } : null;
+    return user
+      ? {
+          profession: user.profession,
+          maritalStatus: user.maritalStatus,
+          kids: user.kids,
+          birthday: user.birthday,
+          salary: user.salary,
+        }
+      : null;
   });
 
   protected readonly pending = signal(false);

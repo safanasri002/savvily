@@ -1,0 +1,139 @@
+:host {
+  display: block;
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.notice-title { margin: 0; font-weight: 500; }
+.notice-text { margin: 0; color: var(--text-muted); font-size: 13.5px; }
+.notice .btn-secondary { flex-shrink: 0; height: 34px; font-size: 13px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.card {
+  padding: 20px;
+}
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-head .link-subtle {
+  font-size: 13px;
+}
+
+.muted {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+/* Categories */
+
+.categories,
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.categories {
+  gap: 14px;
+}
+
+.category-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 13.5px;
+}
+
+.category-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Recent transactions */
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  font-size: 13.5px;
+}
+
+.list-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.list-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.list-title {
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.list-meta {
+  color: var(--text-muted);
+  font-size: 12.5px;
+}
+
+/* Goals */
+
+.goal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.goal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.goal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13.5px;
+}
+
+@media (max-width: 820px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .notice { flex-direction: column; align-items: stretch; }
+}

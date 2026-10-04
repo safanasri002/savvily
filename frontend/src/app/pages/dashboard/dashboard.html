@@ -1,0 +1,106 @@
+<header class="page-header">
+  <h1 class="page-title">{{ greeting() }}, {{ auth.currentUser()?.firstName }}</h1>
+  <p class="page-subtitle">Here's an overview of your finances for {{ monthLabel }}.</p>
+</header>
+
+@if (!auth.profileComplete()) {
+  <aside class="notice">
+    <div>
+      <p class="notice-title">Finish setting up your profile</p>
+      <p class="notice-text">Add your profession and salary so Savvily can tailor your budget.</p>
+    </div>
+    <a class="btn-secondary" routerLink="/profile">Complete profile</a>
+  </aside>
+}
+
+<section class="stats" aria-label="This month">
+  <div class="stat">
+    <p class="stat-label">Balance</p>
+    <p class="stat-value">{{ money(balance()) }}</p>
+    <p class="stat-hint">Income minus expenses</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Income</p>
+    <p class="stat-value amount is-income">{{ money(income()) }}</p>
+    <p class="stat-hint">This month</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Expenses</p>
+    <p class="stat-value">{{ money(expenses()) }}</p>
+    <p class="stat-hint">This month</p>
+  </div>
+  <div class="stat">
+    <p class="stat-label">Savings rate</p>
+    <p class="stat-value">{{ savingsRate() }}%</p>
+    <p class="stat-hint">{{ money(totalSaved()) }} saved in goals</p>
+  </div>
+</section>
+
+<div class="grid">
+  <section class="card" aria-labelledby="categories-heading">
+    <h2 id="categories-heading" class="panel-title">Spending by category</h2>
+    @if (byCategory().length) {
+      <ul class="categories">
+        @for (c of byCategory(); track c.value) {
+          <li class="category">
+            <div class="category-head">
+              <span class="category-name"><span class="dot" [style.background]="c.color"></span>{{ c.label }}</span>
+              <span class="amount">{{ money(c.amount) }}</span>
+            </div>
+            <div class="progress" role="presentation">
+              <div class="progress-bar" [style.width.%]="c.share" [style.background]="c.color"></div>
+            </div>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="muted">No expenses this month yet.</p>
+    }
+  </section>
+
+  <section class="card" aria-labelledby="recent-heading">
+    <div class="panel-head">
+      <h2 id="recent-heading" class="panel-title">Recent transactions</h2>
+      <a class="link-subtle" routerLink="/spendings">View all</a>
+    </div>
+    <ul class="list">
+      @for (t of recent(); track t.id) {
+        <li class="list-item">
+          <span class="dot" [style.background]="category(t.category).color"></span>
+          <span class="list-main">
+            <span class="list-title">{{ t.label }}</span>
+            <span class="list-meta">{{ category(t.category).label }} · {{ shortDate(t.date) }}</span>
+          </span>
+          <span class="amount" [class.is-income]="t.type === 'income'">
+            {{ t.type === 'income' ? '+' : '−' }}{{ money(t.amount) }}
+          </span>
+        </li>
+      } @empty {
+        <li class="muted">No transactions yet.</li>
+      }
+    </ul>
+  </section>
+</div>
+
+<section class="card goals" aria-labelledby="goals-heading">
+  <div class="panel-head">
+    <h2 id="goals-heading" class="panel-title">Savings goals</h2>
+    <a class="link-subtle" routerLink="/goals">Manage goals</a>
+  </div>
+  <div class="goal-grid">
+    @for (g of goals(); track g.id) {
+      <div class="goal">
+        <div class="goal-head">
+          <span class="list-title">{{ g.name }}</span>
+          <span class="list-meta">{{ percent(g.saved, g.target) }}%</span>
+        </div>
+        <div class="progress">
+          <div class="progress-bar" [class.is-done]="g.saved >= g.target" [style.width.%]="percent(g.saved, g.target)"></div>
+        </div>
+        <span class="list-meta"><span class="amount">{{ money(g.saved) }}</span> of <span class="amount">{{ money(g.target) }}</span></span>
+      </div>
+    } @empty {
+      <p class="muted">No goals yet. <a class="link" routerLink="/goals">Create one</a></p>
+    }
+  </div>
+</section>

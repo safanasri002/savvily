@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/shared/profile-form/profile-form.css"],
+  "sourcesContent": [":host {\r\n  display: block;\r\n}\r\n\r\n.actions {\r\n  display: flex;\r\n  align-items: center;\r\n  justify-content: flex-end;\r\n  gap: 16px;\r\n  margin-top: 4px;\r\n}\r\n\r\n.actions .btn-primary {\r\n  min-width: 120px;\r\n}\r\n\r\n@media (max-width: 420px) {\r\n  .actions {\r\n    flex-direction: column-reverse;\r\n    align-items: stretch;\r\n    gap: 12px;\r\n  }\r\n}\r\n"],
+  "mappings": ";AAAA;AACE,WAAS;AACX;AAEA,CAAC;AACC,WAAS;AACT,eAAa;AACb,mBAAiB;AACjB,OAAK;AACL,cAAY;AACd;AAEA,CARC,QAQQ,CAAC;AACR,aAAW;AACb;AAEA,QAAO,WAAY;AACjB,GAbD;AAcG,oBAAgB;AAChB,iBAAa;AACb,SAAK;AACP;AACF;",
+  "names": []
+}

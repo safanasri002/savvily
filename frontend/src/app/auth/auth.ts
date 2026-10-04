@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Sign } from '../service/sign';
+import { AuthService } from '../core/auth.service';
 
 export type AuthMode = 'sign-in' | 'sign-up';
 
@@ -24,7 +24,7 @@ const ERROR_MESSAGES: Record<FieldName, Record<string, string>> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Auth {
-  private readonly auth = inject(Sign);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   protected readonly mode = signal<AuthMode>('sign-in');
@@ -40,11 +40,6 @@ export class Auth {
     lastName: [{ value: '', disabled: true }, Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    profession : [{ value: '', disabled: true }, Validators.required],
-    maritalstatus : [{ value: '', disabled: true }, Validators.required],
-    kids : [{ value:0, disabled: true }, Validators.required],
-    birthday : [{ value: '', disabled: true }, Validators.required],
-    salary : [{ value: 0, disabled: true }, Validators.required],
   });
 
   protected setMode(mode: AuthMode): void {
@@ -81,21 +76,18 @@ export class Auth {
     this.formError.set(null);
     if (this.form.invalid || this.pending()) {
       this.form.markAllAsTouched();
-
       return;
     }
 
-    const { firstName, lastName, email, password ,profession , maritalstatus, kids, birthday, salary} = this.form.getRawValue();
+    const { firstName, lastName, email, password } = this.form.getRawValue();
     this.pending.set(true);
     try {
       if (this.isSignUp()) {
-        await this.auth.signUp({firstname:firstName,lastname:lastName, email, password, profession , maritalstatus, kids, birthday, salary});
+        await this.auth.signUp({ firstName, lastName, email, password });
         await this.router.navigateByUrl('/onboarding');
-        console.log('Sign up successful');
       } else {
-        //await this.auth.signIn({ email, password });
+        await this.auth.signIn({ email, password });
         await this.router.navigateByUrl('/dashboard');
-        console.log('Sign in successful');
       }
     } catch (error) {
       this.formError.set(error instanceof Error ? error.message : 'Something went wrong. Please try again.');

@@ -64,13 +64,10 @@
   color: var(--text-muted);
 }
 
-.forgot {
-  font-size: 12.5px;
-}
-
 .switch {
   margin: 20px 0 0;
   text-align: center;
   color: var(--text-muted);
   font-size: 13.5px;
 }
+

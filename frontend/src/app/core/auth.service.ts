@@ -1,19 +1,28 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { API_URL, TOKEN_KEY, toUserError } from './api';
+import { readJson, removeKey, writeJson } from './storage';
 import { SignInData, SignUpData, User, UserProfile, isProfileComplete } from './user';
 
 const SESSION_KEY = 'savvily.session';
-const USERS_KEY = 'savvily.users';
+
+interface AuthResponse {
+  accessToken: string;
+  tokenType: string;
+  user: User;
+}
 
 /**
  * Single source of truth for the signed-in user.
  *
- * TEMPORARY: until the backend exists, accounts live in localStorage and
- * passwords are NOT checked or stored. Only the bodies of `signUp`, `signIn`,
- * `signOut` and `updateProfile` need to change to call the real API.
+ * The JWT and a copy of the user are kept in localStorage so the guards can
+ * answer synchronously on reload; the user is then refreshed from the API.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly user = signal<User | null>(readJson<User>(SESSION_KEY));
+  private readonly http = inject(HttpClient);
+  private readonly user = signal<User | null>(readJson<string>(TOKEN_KEY) ? readJson<User>(SESSION_KEY) : null);
 
   readonly currentUser = this.user.asReadonly();
   readonly isAuthenticated = computed(() => this.user() !== null);
@@ -22,90 +31,69 @@ export class AuthService {
     return user !== null && isProfileComplete(user);
   });
 
-  async signUp(data: SignUpData): Promise<User> {
-    const email = normalizeEmail(data.email);
-    const users = this.storedUsers();
-    if (users[email]) {
-      throw new Error('An account with this email already exists.');
-    }
+  constructor() {
+    if (this.user()) void this.refreshUser();
+  }
 
-    const user: User = {
-      id: crypto.randomUUID(),
-      firstName: data.firstName.trim(),
-      lastName: data.lastName.trim(),
-      email,
-      birthday: null,
-      salary: null,
-      profession: null,
-    };
-    this.saveUser(user);
-    return user;
+  async signUp(data: SignUpData): Promise<User> {
+    try {
+      const response = await firstValueFrom(this.http.post<AuthResponse>(`${API_URL}/auth/signup`, data));
+      return this.startSession(response);
+    } catch (error) {
+      throw toUserError(error, 'Could not create your account.');
+    }
   }
 
   async signIn(data: SignInData): Promise<User> {
-    const user = this.storedUsers()[normalizeEmail(data.email)];
-    if (!user) {
-      throw new Error('Invalid email or password.');
+    try {
+      const response = await firstValueFrom(this.http.post<AuthResponse>(`${API_URL}/auth/login`, data));
+      return this.startSession(response);
+    } catch (error) {
+      throw toUserError(error, 'Invalid email or password.');
     }
-    this.setSession(user);
-    return user;
   }
 
   async signOut(): Promise<void> {
-    this.setSession(null);
+    this.clearSession();
   }
 
   async updateProfile(profile: UserProfile): Promise<User> {
-    const current = this.user();
-    if (!current) {
-      throw new Error('You are not signed in.');
+    try {
+      const user = await firstValueFrom(this.http.put<User>(`${API_URL}/users/me`, profile));
+      this.setUser(user);
+      return user;
+    } catch (error) {
+      throw toUserError(error, 'Could not save your profile.');
     }
-    const user = { ...current, ...profile };
-    this.saveUser(user);
+  }
+
+  /** Re-reads the user from the API; an expired or invalid token signs the user out. */
+  private async refreshUser(): Promise<void> {
+    try {
+      this.setUser(await firstValueFrom(this.http.get<User>(`${API_URL}/users/me`)));
+    } catch (error) {
+      if (error instanceof HttpErrorResponse && error.status === 401) {
+        this.clearSession();
+        location.assign('/auth');
+      }
+      // Other errors (server down): keep the cached user.
+    }
+  }
+
+  private startSession({ accessToken, user }: AuthResponse): User {
+    writeJson(TOKEN_KEY, accessToken);
+    this.setUser(user);
     return user;
   }
 
-  private saveUser(user: User): void {
-    writeJson(USERS_KEY, { ...this.storedUsers(), [user.email]: user });
-    this.setSession(user);
-  }
-
-  private setSession(user: User | null): void {
+  private setUser(user: User): void {
     this.user.set(user);
-    if (user) writeJson(SESSION_KEY, user);
-    else removeKey(SESSION_KEY);
+    writeJson(SESSION_KEY, user);
   }
 
-  private storedUsers(): Record<string, User> {
-    return readJson<Record<string, User>>(USERS_KEY) ?? {};
-  }
-}
-
-function normalizeEmail(email: string): string {
-  return email.trim().toLowerCase();
-}
-
-function readJson<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeJson(key: string, value: unknown): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Storage unavailable (private mode, quota): the session stays in memory only.
-  }
-}
-
-function removeKey(key: string): void {
-  try {
-    localStorage.removeItem(key);
-  } catch {
-    // Ignore: nothing to clean up.
+  private clearSession(): void {
+    this.user.set(null);
+    removeKey(TOKEN_KEY);
+    removeKey(SESSION_KEY);
   }
 }
